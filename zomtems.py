@@ -6,12 +6,14 @@ from random import Random
 
 
 class Zomtem(object):
-    def __init__(self, value):
-        assert isinstance(value, str)
+    def __init__(self, value, encoding='utf-8'):
+        if isinstance(value, str):
+            value = value.encode(encoding)
+        assert isinstance(value, bytes)
         self.value = value
 
     def __str__(self):
-        return self.value
+        return self.value.decode()
 
     def __len__(self):
         return 1 if self.value else 0
@@ -20,10 +22,12 @@ class Zomtem(object):
     def depth(self):
         return 0
 
+    def hash(self, hashfun, rng, secret):
+        return hashfun(self.value)
+
 
 class Zombranch(object):
-    def __init__(self, children=None, depth=1, seed=0):
-        self.rnd = Random(seed)
+    def __init__(self, children=None, depth=1):
         self._length = 0
         self._depth = 1
         if children is None:
@@ -71,9 +75,20 @@ class Zombranch(object):
     def __repr__(self):
         return "[%s, %s]" % (self.children[0], self.children[1])
 
+    def hash(self, seed=0, hashfun=hashlib.sha512, rng=None, secret=None):
+        if not rng:
+            rng = Random(seed)
+        h = hashfun()
+        for id in (0, 1):
+            if self.children[id]:
+                h.update(self.children[id].hash(hashfun=hashfun, rng=rng, secret=secret).digest())
+        return h
+
+
 
 if __name__ == '__main__':
     zombranch = Zombranch()
     for i in range(16):
         zombranch.append(Zomtem(str(i)))
         print(zombranch)
+        print(zombranch.hash().hexdigest())
