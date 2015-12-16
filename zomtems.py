@@ -3,6 +3,7 @@
 
 import hashlib
 from random import Random
+import logging
 
 
 class Zomtem(object):
@@ -82,11 +83,13 @@ class Zombranch(object):
         for id in (0, 1):
             if self.children[id]:
                 h.update(self.children[id].hash(hashfun=hashfun, rng=rng, secret=secret).digest())
+        logging.debug("hash(%s) = %s", self, h.hexdigest())
         return h
 
 
 
 if __name__ == '__main__':
+    logging.getLogger().setLevel(logging.INFO)
     zombranch = Zombranch()
     for i in range(16):
         zombranch.append(Zomtem(str(i)))
