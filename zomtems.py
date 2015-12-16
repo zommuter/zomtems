@@ -39,6 +39,9 @@ class Zombranch(object):
     def depth(self):
         return self._depth
 
+    def __len__(self):
+        return self.length
+
     def append(self, zomtem):
         """Sets a free child to `zomtem` if possible, returns success
         """
