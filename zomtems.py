@@ -24,7 +24,12 @@ class Zomtem(object):
         return 0
 
     def hash(self, hashfun, rng, secret):
-        return hashfun(self.value + secret)
+        h = hashfun(self.value)
+        if rng:  # Add PRNG "hash" to hide repetitious Zomtems
+            l = len(h.digest())
+            h.update((("%0" + str(l) + "x") % rng.randint(0, 2**l - 1)).encode())
+        h.update(secret)
+        return h
 
 
 class Zombranch(object):
@@ -77,8 +82,6 @@ class Zombranch(object):
         return "[%s, %s]" % (self.children[0], self.children[1])
 
     def hash(self, seed=0, hashfun=hashlib.sha512, rng=None, secret=b''):
-        if not rng:
-            rng = Random(seed)
         h = hashfun()
         for id in (0, 1):
             if self.children[id]:
@@ -94,4 +97,4 @@ if __name__ == '__main__':
     for i in range(16):
         zombranch.append(Zomtem(str(i)))
         print(zombranch)
-        print(zombranch.hash().hexdigest())
+        print(zombranch.hash(rng=Random(0)).hexdigest())
