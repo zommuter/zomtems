@@ -23,7 +23,7 @@ class Zomtem(object):
         return 0
 
     def hash(self, hashfun, rng, secret):
-        return hashfun(self.value)
+        return hashfun(self.value + secret)
 
 
 class Zombranch(object):
@@ -75,7 +75,7 @@ class Zombranch(object):
     def __repr__(self):
         return "[%s, %s]" % (self.children[0], self.children[1])
 
-    def hash(self, seed=0, hashfun=hashlib.sha512, rng=None, secret=None):
+    def hash(self, seed=0, hashfun=hashlib.sha512, rng=None, secret=b''):
         if not rng:
             rng = Random(seed)
         h = hashfun()
