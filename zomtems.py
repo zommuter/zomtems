@@ -23,7 +23,7 @@ class Zomtem(object):
 
 class Zombranch(object):
     def __init__(self, children=None, depth=1):
-        self.length = 0
+        self._length = 0
         self._depth = 1
         if children is None:
             self.children = [None, None]
@@ -32,7 +32,7 @@ class Zombranch(object):
             self.children = children.copy()
         for child in self.children:
             if child:
-                self.length += len(child)
+                self._length += len(child)
                 self._depth = max(self.depth, child.depth)
 
     @property
@@ -40,35 +40,35 @@ class Zombranch(object):
         return self._depth
 
     def __len__(self):
-        return self.length
+        return self._length
 
     def append(self, zomtem):
         """Sets a free child to `zomtem` if possible, returns success
         """
-        if self.length < 2**(self._depth - 1):  # a subitem slot is available in child 0
+        if self._length < 2**(self._depth - 1):  # a subitem slot is available in child 0
             id = 0
-        elif self.length < 2**self._depth:       # a subitem slot is available in child 1
+        elif self._length < 2**self._depth:       # a subitem slot is available in child 1
             id = 1
         else:  # no subitem slot available, must increase depth
-            assert self.length == 2**self._depth  # if it's more, we messed up
+            assert self._length == 2 ** self._depth  # if it's more, we messed up
             self.children[0] = Zombranch(self.children, depth=self._depth)
             self.children[1] = zomtem
             self._depth += 1
-            self.length += 1
+            self._length += 1
             return True
         if isinstance(self.children[id], Zombranch):
             assert self.children[id].append(zomtem)  # shouldn't fail
-            self.length += 1
+            self._length += 1
             return True
         elif self.children[id]:
             assert isinstance(self.children[id], Zomtem)
             self.children[id] = Zombranch([self.children[id], zomtem], self._depth - 1)
-            self.length += 1
+            self._length += 1
             return True
         else:
             assert self.children[id] is None
             self.children[id] = zomtem
-            self.length += 1
+            self._length += 1
             return True
 
     def __repr__(self):
