@@ -22,7 +22,8 @@ class Zomtem(object):
 
 
 class Zombranch(object):
-    def __init__(self, children=None, depth=1):
+    def __init__(self, children=None, depth=1, seed=0):
+        self.rnd = Random(seed)
         self._length = 0
         self._depth = 1
         if children is None:
@@ -71,20 +72,8 @@ class Zombranch(object):
         return "[%s, %s]" % (self.children[0], self.children[1])
 
 
-class Zomtree(object):
-    def __init__(self, seed=0):
-        self.rnd = Random(seed)
-        self.base = Zombranch()
-
-    def append(self, zomtem):
-        assert self.base.append(zomtem)
-
-    def __repr__(self):
-        return repr(self.base)
-
-
 if __name__ == '__main__':
-    zomtree = Zomtree()
+    zombranch = Zombranch()
     for i in range(16):
-        zomtree.append(Zomtem(str(i)))
-        print(zomtree)
+        zombranch.append(Zomtem(str(i)))
+        print(zombranch)
