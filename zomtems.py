@@ -58,18 +58,14 @@ class Zombranch(object):
             return True
         if isinstance(self.children[id], Zombranch):
             assert self.children[id].append(zomtem)  # shouldn't fail
-            self._length += 1
-            return True
         elif self.children[id]:
             assert isinstance(self.children[id], Zomtem)
             self.children[id] = Zombranch([self.children[id], zomtem], self._depth - 1)
-            self._length += 1
-            return True
         else:
             assert self.children[id] is None
             self.children[id] = zomtem
-            self._length += 1
-            return True
+        self._length += 1
+        return True
 
     def __repr__(self):
         return "%s" % [str(child) for child in self.children]
