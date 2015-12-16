@@ -68,7 +68,7 @@ class Zombranch(object):
         return True
 
     def __repr__(self):
-        return "%s" % [str(child) for child in self.children]
+        return "[%s, %s]" % (self.children[0], self.children[1])
 
 
 class Zomtree(object):
