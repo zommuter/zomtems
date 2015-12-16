@@ -29,7 +29,7 @@ class Zombranch(object):
             self.children = [None, None]
         else:
             assert len(children) == 2
-            self.children = children
+            self.children = children.copy()
         for child in self.children:
             if child:
                 self.length += len(child)
