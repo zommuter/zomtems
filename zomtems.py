@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import hashlib
-from random import Random
 import logging
 
 
@@ -25,11 +24,9 @@ class Zomtem(object):
     def depth(self):
         return 0
 
-    def hash(self, hashfun, rng, secret):
+    def hash(self, hashfun, secret):
         h = hashfun(self.value)
         l = len(h.digest())
-        if rng:  # Add PRNG "hash" to hide repetitious Zomtems
-            h.update((("%0" + str(l) + "x") % rng.randint(0, 256**l - 1)).encode())
         id_secret = hashfun(secret + (("%0" + str(l) + "x") % self.id).encode()).digest()
         h.update(id_secret)
         return h
@@ -85,11 +82,11 @@ class Zombranch(object):
     def __repr__(self):
         return "[%s, %s]" % (self.children[0], self.children[1])
 
-    def hash(self, seed=0, hashfun=hashlib.sha512, rng=None, secret=b''):
+    def hash(self, seed=0, hashfun=hashlib.sha512, secret=b''):
         h = hashfun()
         for id in (0, 1):
             if self.children[id]:
-                h.update(self.children[id].hash(hashfun=hashfun, rng=rng, secret=secret).digest())
+                h.update(self.children[id].hash(hashfun=hashfun, secret=secret).digest())
         logging.debug("hash(%s) = %s", self, h.hexdigest())
         return h
 
@@ -101,5 +98,5 @@ if __name__ == '__main__':
     for i in range(16):
         zombranch.append(Zomtem(str(i)))
         print(zombranch)
-        print(zombranch.hash(rng=Random(0)).hexdigest())
+        print(zombranch.hash().hexdigest())
         print(zombranch.hash(secret=b"I'm a little teapot").hexdigest())
