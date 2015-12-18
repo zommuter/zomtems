@@ -7,11 +7,13 @@ import logging
 
 
 class Zomtem(object):
-    def __init__(self, value, encoding='utf-8'):
+    def __init__(self, value, encoding='utf-8', id=None):
         if isinstance(value, str):
             value = value.encode(encoding)
         assert isinstance(value, bytes)
         self.value = value
+        self.id = id
+
 
     def __str__(self):
         return self.value.decode()
@@ -25,10 +27,11 @@ class Zomtem(object):
 
     def hash(self, hashfun, rng, secret):
         h = hashfun(self.value)
+        l = len(h.digest())
         if rng:  # Add PRNG "hash" to hide repetitious Zomtems
-            l = len(h.digest())
             h.update((("%0" + str(l) + "x") % rng.randint(0, 256**l - 1)).encode())
-        h.update(secret)  # TODO: derive per-Zomtem secret
+        id_secret = hashfun(secret + (("%0" + str(l) + "x") % self.id).encode()).digest()
+        h.update(id_secret)
         return h
 
 
@@ -56,6 +59,7 @@ class Zombranch(object):
     def append(self, zomtem):
         """Sets a free child to `zomtem` if possible, returns success
         """
+        zomtem.id = self._length + 1
         if self._length < 2**(self._depth - 1):  # a subitem slot is available in child 0
             id = 0
         elif self._length < 2**self._depth:       # a subitem slot is available in child 1
@@ -98,3 +102,4 @@ if __name__ == '__main__':
         zombranch.append(Zomtem(str(i)))
         print(zombranch)
         print(zombranch.hash(rng=Random(0)).hexdigest())
+        print(zombranch.hash(secret=b"I'm a little teapot").hexdigest())
