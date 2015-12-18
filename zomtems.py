@@ -27,8 +27,8 @@ class Zomtem(object):
         h = hashfun(self.value)
         if rng:  # Add PRNG "hash" to hide repetitious Zomtems
             l = len(h.digest())
-            h.update((("%0" + str(l) + "x") % rng.randint(0, 2**l - 1)).encode())
-        h.update(secret)
+            h.update((("%0" + str(l) + "x") % rng.randint(0, 256**l - 1)).encode())
+        h.update(secret)  # TODO: derive per-Zomtem secret
         return h
 
 
