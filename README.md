@@ -1,6 +1,7 @@
 ---
 format: markdown_github
 comment: use pandoc
+
 ---
 
 
@@ -36,6 +37,14 @@ or even have it notarized, and you've got credible proof of having knowledge
 of the information itself^[Or more precisely, it is highly unlikely that you'll
 find another meaningful string that yields the same hash.].
 
+Actually, since [almost every 256-bit number is a valid private ECDSA
+key](http://bitcoin.stackexchange.com/a/21269/1137) and as such can be used
+to generate a [bitcoin](https://en.wikipedia.org/wiki/Bitcoin) (or similar)
+address, you can transfer a tiny amount of bitcoins to that and back to your
+own (or better yet, use a multisignature transaction) such that the [Bitcoin
+network](https://en.wikipedia.org/wiki/Bitcoin_network) serves as a simple
+[timestamp](https://en.wikipedia.org/wiki/Timestamp).
+
 
 ### The problem
 But what if you don't want to reveal the entire information when someone
@@ -58,3 +67,50 @@ work since you could fake a "hash" to `xor` your claimed idea with as well...]
 this is sufficient proof of knowledge of _all_ zomtems involved by revealing
 the respective branches of the tree _without_ revealing what the other hashes
 represent.
+
+### Refinements
+#### Salt &amp; Pepper
+As hinted at e.g. [here](http://crypto.stackexchange.com/a/26660/2663), the
+"sibblings" of zomtems you revealed might be guessed by a brute force attack,
+especially if you broke your idea down into very short sentences. Therefore,
+each zomtem should additionally be concatenated with an _individual_ key per
+item. One method is described in the previously mentioned place, by defining
+a global secret `k` and generating the `i`th zomtem's key as `hash(k, i)`.
+Alternatively, a deterministig PRNG could be used^[This key is not exactly a
+[salt](https://en.wikipedia.org/wiki/Salt_%28cryptography%29), since it's
+kept secret, nor is a pepper, which would be the same for _each_ zomtem, but
+the meaning should be clear nonetheless.].
+
+#### Digital signature
+However, since the unhashed zomtems need to be stored in a secure manner as
+well (otherwise one cannot reproduce the Merkle tree and all effort was in
+vain), using encryption is strongly recommended. And then one might just as
+well use a (deterministic!) cryptographic signature instead of the
+aforementioned salt-ish approach.
+
+#### Context
+As mentioned before, context may be important to store alongside the zomtem,
+therefore one could for example append a string such as
+
+```
+Follows: 0xbeef
+Precedes: 0xcafe
+Other context: 0xfeed, 0x3ead
+```
+
+to the zomtem before hashing it into the Merkle tree, where the hex-codes
+represent other zomtems' hashes (without their context-block, unless you
+like recursion). Again, these can be modified via the aforementioned methods
+in order to prevent premature information leakages.
+
+## About the name
+As mentioned before, a _zomtem_ denotes a piece of information, and the name
+is a [portmanteau](https://en.wikipedia.org/wiki/Portmanteau) of _zommuting
+item_. Determining the meaning of _zommuting_ is left as an excercise to the
+reader for now, a brief explanation is denoted by
+`6c22977048a0ef1771dac88ea38696610cd8511ce56c812b119247977f31da5d` (or
+`7c034cdd5ff0ae45f431d9b644596c075f1cbba709474fef588a14620b942da9`)
+and should be rather obvious from watching
+[the `29892acefcdb5bbd2a9fb0f3ee74e1f35c20d1c1feb8d57da439064366492629`
+scene](https://`624bf2865e7809510819e428fbd1978d97fc3b377353294d83b530d644b768ee`)
+from `46fbdcf215fdb142ff52c30f91531116a3927f797d602017aeb4f966051cf87c`.
