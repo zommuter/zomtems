@@ -40,10 +40,21 @@ find another meaningful string that yields the same hash.].
 ### The problem
 But what if you don't want to reveal the entire information when someone
 else merely claimed knowledge of a part of your information, say of
-`partial = "I'm a clever teapot"`? You could of course generate hashes for
-each line, sentence, or even word of your information, but that means a vast
-amount of hashes (and probably a larger bill by your notary) for each and
-every conceivable permutation. And context is important, too, how to include
-that? So hashes are good, but not sufficient here.
+`partial = "I'm a clever teapot"`? What about additional information obtained
+or generated later? You could of course generate hashes for each line,
+sentence, or even word of your information, but that means a vast amount of
+hashes (and probably a larger bill by your notary) for each and every
+conceivable permutation. And context is important, too, especially if the
+information is split into very small chunks, how to include that?
+So hashes are good, but not sufficient here.
 
 ### The solution
+Let's use a [Merkle tree](https://en.wikipedia.org/wiki/Merkle_tree):
+Each piece of information, from now on called _zomtem_ as motivated later on,
+is individually hashed, and two or more such hashes are concatenated and
+hashed again, and so on until a single hash is left for publication. Assuming
+the protocol is cryptograhically secure^[`xor`ing the hashes e.g. would _not_
+work since you could fake a "hash" to `xor` your claimed idea with as well...]
+this is sufficient proof of knowledge of _all_ zomtems involved by revealing
+the respective branches of the tree _without_ revealing what the other hashes
+represent.
